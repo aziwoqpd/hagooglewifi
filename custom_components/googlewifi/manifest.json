@@ -4,7 +4,7 @@
     "config_flow": true,
     "documentation": "https://github.com/djtimca/hagooglewifi",
     "requirements": [
-      "git+https://github.com/aziwoqpd/googlewifi-api@main:0.0.19",
+      "git+https://github.com/aziwoqpd/googlewifi-api.git@main#googlewifi==0.0.19",
       "gpsoauth>=1.0.2",
       "grpcio>=1.45.0"
     ],
