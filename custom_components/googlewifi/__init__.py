@@ -28,7 +28,8 @@ from .const import (
     DOMAIN,
     GOOGLEWIFI_API,
     POLLING_INTERVAL,
-    REFRESH_TOKEN,
+    MASTER_TOKEN,
+    EMAIL,
     SIGNAL_ADD_DEVICE,
     SIGNAL_DELETE_DEVICE,
 )
@@ -55,7 +56,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     session = aiohttp_client.async_get_clientsession(hass)
 
-    api = GoogleWifi(refresh_token=conf[REFRESH_TOKEN], session=session)
+    api = GoogleWifi(master_token=conf[MASTER_TOKEN], email=conf[EMAIL], session=session)
 
     try:
         await api.connect()
@@ -71,7 +72,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         api=api,
         name="GoogleWifi",
         polling_interval=polling_interval,
-        refresh_token=conf[REFRESH_TOKEN],
+        master_token=conf[MASTER_TOKEN],
+        email=conf[EMAIL],
         entry=entry,
         add_disabled=conf.get(ADD_DISABLED, True),
         auto_speedtest=conf_options.get(CONF_SPEEDTEST, DEFAULT_SPEEDTEST),
@@ -135,7 +137,8 @@ class GoogleWiFiUpdater(DataUpdateCoordinator):
         api: str,
         name: str,
         polling_interval: int,
-        refresh_token: str,
+        master_token: str,
+        email: str,
         entry: ConfigEntry,
         add_disabled: bool,
         auto_speedtest: str,
@@ -143,7 +146,8 @@ class GoogleWiFiUpdater(DataUpdateCoordinator):
     ):
         """Initialize the global Google Wifi data updater."""
         self.api = api
-        self.refresh_token = refresh_token
+        self.master_token = master_token
+        self.email = email
         self.entry = entry
         self.add_disabled = add_disabled
         self._last_speedtest = 0
@@ -238,7 +242,7 @@ class GoogleWiFiUpdater(DataUpdateCoordinator):
             return system_data
         except GoogleWifiException as error:
             session = aiohttp_client.async_create_clientsession(self.hass)
-            self.api = GoogleWifi(refresh_token=self.refresh_token, session=session)
+            self.api = GoogleWifi(master_token=self.master_token, email=self.email, session=session)
         except GoogleHomeIgnoreDevice as error:
             raise UpdateFailed(f"Error connecting to GoogleWifi: {error}") from error
         except ConnectionError as error:

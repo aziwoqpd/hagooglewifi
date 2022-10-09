@@ -26,7 +26,8 @@ from .const import (
     DEFAULT_SPEEDTEST_INTERVAL,
     DOMAIN,
     POLLING_INTERVAL,
-    REFRESH_TOKEN,
+    MASTER_TOKEN,
+    EMAIL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,8 +56,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             session = aiohttp_client.async_get_clientsession(self.hass)
 
-            token = user_input[REFRESH_TOKEN]
-            api_client = GoogleWifi(token, session)
+            token = user_input[MASTER_TOKEN]
+            email = user_input[EMAIL]
+            api_client = GoogleWifi(token, email, session)
 
             try:
                 await api_client.connect()
@@ -68,7 +70,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
             else:
-                await self.async_set_unique_id(user_input[REFRESH_TOKEN])
+                await self.async_set_unique_id(user_input[MASTER_TOKEN])
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(title="Google Wifi", data=user_input)
 
@@ -76,7 +78,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(REFRESH_TOKEN): str,
+                    vol.Required(MASTER_TOKEN): str,
+                    vol.Required(EMAIL): str,
                     vol.Required(ADD_DISABLED, default=True): bool,
                 }
             ),

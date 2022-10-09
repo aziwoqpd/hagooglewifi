@@ -23,7 +23,8 @@
       "step": {
         "init": {
           "data": {
-            "refresh_token": "Enter the refresh token obtained from https://www.angelod.com/onhubauthtool",
+            "master_token": "master token",
+            "email": "Email address",
             "add_disabled": "Add all entities as enabled?",
             "scan_interval": "Polling Interval (seconds)",
             "auto_speedtest": "Run speed test automatically?",
